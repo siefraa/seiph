@@ -10,16 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
 
+      # 2️⃣ Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
 
+      # 3️⃣ Cache Flutter dependencies
+      - name: Cache Flutter Pub
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            .pub-cache
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+
+      # 4️⃣ Get dependencies
       - run: flutter pub get
 
+      # 5️⃣ Clean old build (optional but recommended)
+      - run: flutter clean
+
+      # 6️⃣ Build APK release
       - run: flutter build apk --release
 
+      # 7️⃣ Upload APK artifact
       - uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
